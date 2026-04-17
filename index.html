@@ -1,0 +1,549 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta
+		name="description" 
+		content="Enhanced Sketchfab 3D model Viewer for artistic study. Customize FOV, grids, lighting, frame-by-frame animation and more!"
+		/>
+	<meta name="keywords" content="3D reference, artist tool, Sketchfab viewer, digital art, customized sketchfab, anatomy study, 3D model reference, frame-by-frame animation">
+	<meta property="og:title" content="PasteARef - An enhanced Sketchfab model viewer built for artists!"/>
+	<meta property="og:type" content="website"/>
+	<meta
+	    content="assets/images/pastearef.png"
+	    property="og:image"
+	/>
+	<title>PasteARef | 3D Reference Tool for Artists</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://static.sketchfab.com/api/sketchfab-viewer-1.12.0.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+<div class="layout-wrapper">
+	<aside class="sidebar">
+		<div class="sidebar-fixed-top">
+		
+			<header class="sidebar-header">
+				<h2>PasteARef</h2>
+				<div class="help-container">
+					<label for="help-btn">What is PasteARef?</label>
+					<button class="help-button" id="help-btn">?</button>
+				</div>        
+			</header>
+
+			<div id="help-panel" class="help-panel">
+				<p>PasteARef is a embedded SketchFab model viewer built on the <a href="https://sketchfab.com/developers/viewer" target="_blank">Sketchfab Viewer API</a> with more custom controls for digital and traditional artists looking for references!</p>
+				<p>Looking for more info? Check out the GitHub page. Check the <a href="https://sketchfab.com" target="_blank">Sketchfab Docs</a>.</p>
+			</div>
+			
+			<div class="load-form">
+				<label for="model-id-input">Paste your chosen model URL or uid:</label>
+				<div class="input-row">
+					<input type="text" id="model-id-input" placeholder="Enter Sketchfab model uid or full URL..." value="1c5c8929e7374407aeb3c5be3b25401d">
+					<button id="load-model">Load</button>
+				</div>
+			</div>	
+		</div>
+		
+		<div class="sidebar-scrollable-content">
+		
+			<details class="dropdown" open>
+				<summary class="section-title">Grids</summary>
+				
+				<div class="content-wrapper">
+					<div class="subtitle">Perspective grids</div>
+					<div class="btn-row">
+						<button id="toggle-grid-xz" class="grid-button">XZ Wall</button>
+						<button id="toggle-grid-yz" class="grid-button">YZ Wall</button>
+					</div>
+					<div class="graphic-box">
+						<svg id="cube-drawing"><use href="#cube"></use></svg>
+					</div>
+					<div class="flex-row">					
+						<button id="toggle-grid-xy" class="grid-button">Floor (XY)</button>
+					</div>
+					
+					<div class="flex-row">
+						<label>Use light colors for the grids</label>
+						<label class="ios-switch">
+						  <input type="checkbox" id="grid-theme-toggle" autocomplete="off">
+						  <span class="slider"></span>
+						</label>
+					</div>
+					
+					<div class="flex-row">
+						<label for="horizon-toggle">Show eye level (horizon line)</label>
+						<label class="ios-switch">
+							<input type="checkbox" id="horizon-toggle" name="view-options" autocomplete="off">
+							<span class="slider"></span>
+						</label>
+					</div>					
+					
+					<div class="flex-row list-item border-bottom">
+						<label>Rectangular grid</label>
+						<div class="stepper-control">
+							<button id="rect-grid-minus" class="stepper-btn" type="button">-</button>
+							<input type="text" id="rect-grid-value" class="stepper-input" value="5">
+							<button id="rect-grid-plus" class="stepper-btn" type="button">+</button>
+						</div>
+					</div>
+
+					<div class="flex-row list-item">
+						<label>Composition guides</label>
+						<select id="composition-guides" class="custom-select">
+							<option value="off" selected>Off</option>
+							<option value="thirds">Thirds</option>
+							<option value="golden-ratio">Golden Ratio</option>
+							<option value="animation-layout">Anime layout</option>
+						</select>
+					</div>
+
+					<div class="flex-row list-item">
+						<label>Show letterbox</label>
+						<select id="letterbox-select" class="custom-select">
+							<option value="off" selected>Off</option>
+							<option value="16/9">16:9</option>
+							<option value="16/9-animation">16:9 Animation</option>
+							<option value="4/3">4:3</option>
+							<option value="2.35/1">2.35:1</option>
+							<option value="1">Square 1:1</option>
+						</select>
+					</div>					
+					
+					
+			
+
+				</div>
+			</details>
+			
+			<details class="dropdown" open>
+				<summary class="section-title">Model perspective</summary>
+				
+				<div class="content-wrapper">
+					<div class="flex-row">
+						<span>Camera FOV: 
+							<span id="fov-val">45</span>°
+							<div class="help-container">
+								<button class="help-button">?</button>
+								<span class="help-text">The FOV (Field-Of-View) is the angle that the current view takes along the vertical direction as seen from the virtual camera. A wider angle means that more of the scene is visible.</span>
+							</div>
+						</span>
+						<button id="apply-fov">Apply FOV</button>
+					</div>
+					
+					<input type="range" id="fov-slider" min="1" max="179" value="45">
+					 
+					<div class="slider-labels">
+						<span>Orthographic</span>
+						<span>Telephoto</span>
+						<span>Wide-Angle</span>
+						<span>Extreme<br>fish-eye</span>
+					</div>					 
+					
+				</div>
+			</details>
+
+
+			<details class="dropdown" open>
+				<summary class="section-title">Drawing tools</summary>
+				<div class="content-wrapper">
+					<div class="flex-row">
+						<label>Enable sketch canvas</label>
+						<label class="ios-switch" for="drawing-canvas-toggle">
+						  <input type="checkbox" id="drawing-canvas-toggle" autocomplete="off">
+						  <span class="slider"></span>
+						</label>
+					</div>
+					
+					<div class="flex-row">
+						<label>Allow model manipulation</label>
+						<label class="ios-switch" for="drawing-mode-toggle">
+						  <input type="checkbox" id="drawing-mode-toggle" autocomplete="off">
+						  <span class="slider"></span>
+						</label>
+					</div>
+					 
+					<div class="drawing-wrapper">
+						<div class="flex-row options tools-container">
+							<button id="brush" class="option tool active">🖌️</button>
+							<button id="eraser" class="option tool">🧽</button>
+							<button id="text-tool" class="option tool">T</button> 
+						</div>
+					</div>
+					
+					<div class="flex-row">
+						<div class="subtitle">Brush size</div>
+						<input id="size-slider" type="range" min="1" max="30" value="5" class="styled-slider">
+					</div>
+					<div class="flex-row brush-size-container">
+						<div class="size-visuals">
+							<div class="dots flex-row">
+								<span class="dot dot-sm"><span class="dot-label">2px</span></span>
+								<span class="dot dot-md"><span class="dot-label">5px</span></span>
+								<span class="dot dot-lg"><span class="dot-label">10px</span></span>
+								<span class="dot dot-xl"><span class="dot-label">20px</span></span>
+							</div>
+						</div>
+
+						<ul class="colors-grid">
+							<li class="color-swatch selected" style="background: #000;" data-color="#000"></li>
+							<li class="color-swatch" style="background: #ffffff;" data-color="#ffffff"></li>
+							<li class="color-swatch" style="background: #ef1111;" data-color="#ef1111"></li>
+							<li class="color-swatch" style="background: #f6c64a;" data-color="#f6c64a"></li>	
+							<li class="color-swatch" style="background: #73b843;" data-color="#73b843"></li>
+							<li class="color-swatch" style="background: #3bb09b;" data-color="#3bb09b"></li>	
+							<li class="color-swatch" style="background: #2873cf;" data-color="#2873cf"></li>	
+							<li class="color-swatch" style="background: #5c8abc;" data-color="#5c8abc"></li>
+							<li class="color-swatch" style="background: #885bbb;" data-color="#885bbb"></li>	
+							<li class="color-swatch" style="background: #97683c;" data-color="#97683c"></li>
+							<li class="color-swatch" style="background: #de886f;" data-color="#de886f"></li>								
+							<li class="color-swatch color-picker-wrapper">
+								<svg class="ui-icon"><use href="#colorPickerSymbol"></use></svg>							
+								<input type="color" id="brush-color-picker" value="#ffffff"/>
+							</li>  							
+						</ul> 						
+
+					</div>
+					<button id="clear-canvas" class="btn-full-width">CLEAR SKETCH</button>                    
+				</div>
+			</details>
+	
+			<details class="dropdown" open>
+				<summary>Animation</summary>
+				
+				<div class="content-wrapper">
+					<div class="btn-row" style="margin-bottom: 12px;">
+						<button id="two-frame-back">-2f</button>
+						<button id="one-frame-back">-1f</button>
+						<button id="play">&#x23F8;</button>
+						<button id="one-frame-forward">+1f</button>
+						<button id="two-frame-forward">+2f</button>
+					</div>
+		
+					<div class="data-row">
+					  <span>Seconds:</span>
+					  <span class="data-value" id="current-time-val">0.00</span>
+					</div>
+					
+					<div class="data-row">
+					  <span>Frame:</span>
+					  <span class="data-value" id="current-frame-val">0</span>
+					</div>
+
+					<div class="data-row">
+					  <span>Seconds+frame:
+						<div class="help-container">
+							<button class="help-button">?</button>
+							<span class="help-text">This timing notation represents the current integer second rounded by defect + the frame count to represent the fraction of second elapsed, assuming there are 24 frames in a second. This notation is expecially diffused in Japanese animation for timing cuts in the <a href="https://farfromanimation.wordpress.com/2019/05/09/glossario-minimo-di-sigle-e-termini-degli-storyboard-degli-anime/" target="_blank">storyboard!</a></span>
+						</div>
+					  </span>
+					  <span><span class="data-value" id="int-sec-val">0</span><span class="data-value">+</span><span class="data-value" id="frame-sec-val">0</span></span>
+					</div>				
+				</div>			
+			</details>
+			
+			<details class="dropdown" open>
+				<summary>Model lighting
+					<div class="help-container">
+						<button class="help-button">?</button>
+						<span class="help-text">Sketchfab allow models to have up to 3 "analytical" real-time lights. These can be fully customized from the Viewer API. See <a href="https://sketchfab.com/developers/viewer/functions#api-section-lights" target = "_blank" rel="noopener">here</a> for more info. They can also be rotated around the model! Hold Alt + drag the mouse. </span>
+					</div>
+				</summary>
+				
+				<div class="diagram-node">
+					<div class="lighting-diagram">
+						<svg id="cat-drawing"><use href="#gatto"></use></svg>
+					</div>
+					
+					<button class="diagram-toggle-light" data-index="0" style="left: 5%;top: 40%;">
+						<svg class="lightbulb-icon" id="icon-light-1"><use href="#lightbulb"></use></svg>
+						<span class="diagram-text">Light 1</span>
+					</button>
+					
+					<button class="diagram-toggle-light" data-index="1" style="left: 35%;top: 86%;">
+						<svg class="lightbulb-icon" id="icon-light-2"><use href="#lightbulb"></use></svg>
+					  <span class="diagram-text">Light 2</span>
+					</button>
+
+					<button class="diagram-toggle-light" data-index="2" style="left: 70%;top: 40%;">
+						<svg class="lightbulb-icon" id="icon-light-3"><use href="#lightbulb"></use></svg>
+					  <span class="diagram-text">Light 3</span>
+					</button>					
+					
+				</div>
+
+						
+				<div class="content-wrapper">
+
+					<div class="light-control-group" data-index="0">
+						<p>Light 1</p>
+						<button class="toggle-light">On/Off</button>
+
+						<label class="color-picker-wrapper">
+							<svg class="ui-icon"><use href="#colorPickerSymbol"></use></svg>
+							<input type="color" class="color-picker" value="#ffffff"/>
+						</label>
+						
+						<div class="intensity-controls">
+							<label>Intensity:</label>
+							<input type="range" class="intensity-slider" min="0" max="2" step="0.1" value="1">
+							<input type="number" class="intensity-num" min="0" max="2" step="0.1" value="1">
+						</div>
+					</div>
+
+					<div class="light-control-group" data-index="1">
+						<p>Light 2</p>
+						<button class="toggle-light">On/Off</button>
+
+						<label class="color-picker-wrapper">
+							<svg class="ui-icon"><use href="#colorPickerSymbol"></use></svg>
+							<input type="color" class="color-picker" value="#ffffff"/>
+						</label>
+						
+						<div class="intensity-controls">
+							<label>Intensity:</label>
+							<input type="range" class="intensity-slider" min="0" max="2" step="0.1" value="1">
+							<input type="number" class="intensity-num" min="0" max="2" step="0.1" value="1">
+						</div>
+					</div>
+
+					<div class="light-control-group" data-index="2">
+						<p>Light 3</p>
+						<button class="toggle-light">On/Off</button>
+
+						<label class="color-picker-wrapper">
+							<svg class="ui-icon"><use href="#colorPickerSymbol"></use></svg>
+							<input type="color" class="color-picker" value="#ffffff"/>
+						</label>
+
+						
+						<div class="intensity-controls">
+							<label>Intensity:</label>
+							<input type="range" class="intensity-slider" min="0" max="2" step="0.1" value="1">
+							<input type="number" class="intensity-num" min="0" max="2" step="0.1" value="1">
+						</div>
+					</div>	
+				</div>
+			</details>
+		</div>
+	</aside>
+
+	<main id="viewer-container">
+		<iframe src="" id="api-frame"></iframe>
+		<canvas id="drawing-canvas"></canvas>
+		<div id="horizon-line"></div>
+		<div id="grid-overlay"></div> `` Container for 2D composition grids controlled by compositionGridsManages
+		<div id="composition-overlay"></div>
+		<div id="letterbox-overlay"></div>
+		`` Another canvas is created here by three.js when user displays the 3D perspective grids
+	</main>
+
+</div>
+
+
+<script src="js/shaders.js"></script>
+<script src="js/gridManager.js"></script>
+<script src="js/compositionGridsManager.js"></script>
+
+<script src="js/hexColorConverter.js"></script>
+<script src="js/moreInfoPanel.js"></script>
+<script src="js/drawingTools.js" defer></script>
+<script src="js/main.js" defer></script>
+
+<svg style="display: none;">
+	<symbol 
+		   viewBox="0 0 11.703921 13.977887"
+		   version="1.1"
+		   id="colorPickerSymbol"
+		   xmlns="http://www.w3.org/2000/svg"
+		   xmlns:svg="http://www.w3.org/2000/svg">
+		  <defs
+			 id="defs1" />
+		  <g
+			 id="layer1"
+			 transform="translate(-55.563617,-75.13795)">
+			<g
+			   id="path1"
+			   style="opacity:1">
+			  <g
+				 id="g11"
+				 transform="rotate(38.8279,25.837113,39.924094)">
+				<g
+				   id="g12">
+				  <g
+					 id="rect3"
+					 style="opacity:1">
+					<path
+					   style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:#797979;stroke-linejoin:round;paint-order:stroke markers fill;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+					   d="m 78.074873,46.18103 c -1.67338,0.442354 -1.968715,2.361461 -0.05483,2.745009 l 0.08471,6.137803 c -0.02392,1.489184 0.198313,3.879717 2.071623,4.036329 1.632435,-0.400042 1.772457,-2.462416 1.776842,-3.856703 l -0.0025,-6.605007 c 1.547383,-0.3465 1.569037,-2.24062 0.07897,-2.540982 0.02952,-1.564318 -0.289067,-4.268051 -2.270843,-3.966869 -1.981776,0.301182 -1.917439,2.328887 -1.683972,4.05042 z m 2.987627,2.430298 c -0.05841,2.80116 0.125525,5.627639 -0.109288,8.412513 -0.545622,1.714147 -2.166211,0.546142 -1.878081,-0.826746 -0.203046,-2.328808 -0.03818,-5.213856 -0.166561,-7.540396 z"
+					   id="path13" />
+					<path
+					   style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:#4d4d4d;fill-opacity:0;stroke-linejoin:round;paint-order:stroke markers fill;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+					   d="m 79.07276,43.379015 c -0.318291,0.262677 -0.521261,0.660505 -0.521261,1.105417 l 1.32e-4,2.218106 -1.058515,0.390895 9e-5,1.103726 1.058241,0.478303 1.7e-4,7.485666 c 0,0.722602 0.705409,2.534236 1.428011,2.534236 l 0.189255,2.52e-4 c 0.668231,0 1.34282,-1.840528 1.34282,-2.598456 l -9.2e-5,-7.486392 1.058195,-0.527285 -4.5e-5,-1.005589 -1.058244,-0.369512 6.7e-5,-2.287917 c 0,-0.755628 -0.612871,-1.368219 -1.368499,-1.368219 l -0.159151,6.3e-5 c -0.346043,0 -0.663614,0.122401 -0.911174,0.326706 z"
+					   id="path14" />
+				  </g>
+				</g>
+			  </g>
+			</g>
+		  </g>>
+		</symbol>
+	<symbol
+		viewBox="0 0 46.215968 34.607675"
+		version="1.1"
+		id="cube"
+		xml:space="preserve"
+		xmlns="http://www.w3.org/2000/svg"
+		xmlns:svg="http://www.w3.org/2000/svg"><defs
+		 id="defs1" /><g
+		 id="layer2"
+		 transform="translate(57.679171,-56.885417)"><g
+		   id="g34-1"
+		   transform="matrix(1.2405032,0,0,1.2405032,-152.811,105.72443)"><g
+			 id="g46-1"
+			 transform="translate(-19.088073,84.805581)"><g
+			   id="g47-3"
+			   transform="matrix(1.1919302,0,0,1.1919302,-18.720315,25.169253)"><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 120.04277,-113.06324 -8.57625,-2.7332 -8.04442,3.05335"
+				 id="path37-8" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 106.73127,-106.50677 5.00936,-3.33705 4.88968,3.21891"
+				 id="path38-7" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.145918;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+				 d="m 118.78799,-108.96201 3.26812,-10.68174 -10.2267,-1.16466 -9.64051,1.65826 1.98318,10.30353 8.18068,6.85495 z"
+				 id="path15-4" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 111.8294,-120.80841 -0.0571,8.88537"
+				 id="path41-2" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.145918;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill"
+				 d="m 121.16357,-116.72651 -9.42291,-1.93147 -9.02885,2.22457"
+				 id="path23-7" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 113.92481,-111.37237 0.93317,-9.04447"
+				 id="path43-7" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 118.78799,-108.96201 -7.40135,-3.41898 -7.21456,3.53437"
+				 id="path36-9" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 108.55876,-120.28209 0.71484,9.30471"
+				 id="path44-3" /><path
+				 id="path34-1"
+				 style="fill:#464646;fill-opacity:1;stroke:#f1f1f1;stroke-width:0.146085;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+				 d="m 112.07365,-113.48355 -0.0157,6.28231 m -0.19896,-10.15427 -4.4724,1.51993 0.40672,5.47649 4.26464,3.15785 3.73214,-3.0633 0.69328,-5.26352 z" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 109.49604,-104.38544 6.79108,-5.81608"
+				 id="path39-9" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 114.72091,-104.55674 c -1.24332,-0.50266 -7.74815,-5.45964 -7.74815,-5.45964 l -1.48577,-9.70107"
+				 id="path40-8" /><path
+				 style="fill:none;fill-opacity:1;stroke:#b6b6b6;stroke-width:0.161225;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:0.988235;paint-order:fill markers stroke"
+				 d="m 116.28712,-110.20152 2.10617,-9.85937"
+				 id="path42-6" /><path
+				 style="fill:none;fill-opacity:1;stroke:#706bff;stroke-width:0.241837;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+				 d="M 96.059722,-121.21609 H 127.31644"
+				 id="path45-5" /><path
+				 style="font-size:2.84383px;font-family:Arial;-inkscape-font-specification:Arial;fill:#9b99ec;stroke-width:0.241837;paint-order:fill markers stroke"
+				 d="m 105.45377,-123.26123 v -2.03567 h 1.47191 v 0.24022 h -1.20252 v 0.62348 h 1.12614 v 0.23884 h -1.12614 v 0.6929 h 1.24973 v 0.24023 z m 1.84821,0.56793 -0.0278,-0.23467 q 0.0819,0.0222 0.14303,0.0222 0.0833,0 0.1333,-0.0278 0.05,-0.0278 0.0819,-0.0778 0.0236,-0.0375 0.0764,-0.18608 0.007,-0.0208 0.0222,-0.0611 l -0.5596,-1.47746 h 0.26938 l 0.30688,0.85398 q 0.0597,0.16247 0.10692,0.34159 0.043,-0.17218 0.10276,-0.33604 l 0.31521,-0.85953 h 0.24994 l -0.56099,1.49967 q -0.0903,0.24301 -0.14024,0.33465 -0.0667,0.12359 -0.15275,0.18052 -0.0861,0.0583 -0.20551,0.0583 -0.0722,0 -0.16108,-0.0305 z m 2.44253,-1.04283 0.25828,0.0319 q -0.0611,0.22634 -0.22634,0.35131 -0.16524,0.12498 -0.42213,0.12498 -0.32354,0 -0.51378,-0.19857 -0.18885,-0.19996 -0.18885,-0.5596 0,-0.37215 0.19163,-0.57766 0.19162,-0.20551 0.49711,-0.20551 0.29577,0 0.48323,0.20135 0.18746,0.20134 0.18746,0.56654 0,0.0222 -0.001,0.0666 h -1.09976 q 0.0139,0.24301 0.13747,0.37215 0.12358,0.12913 0.30827,0.12913 0.13747,0 0.23467,-0.0722 0.0972,-0.0722 0.15413,-0.23051 z m -0.82065,-0.40408 h 0.82343 q -0.0167,-0.18607 -0.0944,-0.2791 -0.11942,-0.14442 -0.30966,-0.14442 -0.17219,0 -0.29022,0.11526 -0.11664,0.11525 -0.12913,0.30826 z m 2.20369,0.87898 v -2.03567 h 0.26938 v 1.79544 h 1.00256 v 0.24023 z m 2.57027,-0.4749 0.25828,0.0319 q -0.0611,0.22634 -0.22634,0.35131 -0.16524,0.12498 -0.42213,0.12498 -0.32354,0 -0.51378,-0.19857 -0.18884,-0.19996 -0.18884,-0.5596 0,-0.37215 0.19162,-0.57766 0.19163,-0.20551 0.49712,-0.20551 0.29576,0 0.48322,0.20135 0.18746,0.20134 0.18746,0.56654 0,0.0222 -10e-4,0.0666 h -1.09977 q 0.0139,0.24301 0.13747,0.37215 0.12359,0.12913 0.30827,0.12913 0.13747,0 0.23467,-0.0722 0.0972,-0.0722 0.15413,-0.23051 z m -0.82065,-0.40408 h 0.82343 q -0.0167,-0.18607 -0.0944,-0.2791 -0.11942,-0.14442 -0.30966,-0.14442 -0.17218,0 -0.29021,0.11526 -0.11664,0.11525 -0.12914,0.30826 z m 1.80239,0.87898 -0.56099,-1.47468 h 0.26383 l 0.3166,0.88314 q 0.0514,0.14303 0.0944,0.29716 0.0333,-0.11664 0.093,-0.2805 l 0.3277,-0.8998 h 0.25689 l -0.55821,1.47468 z m 2.02178,-0.4749 0.25828,0.0319 q -0.0611,0.22634 -0.22634,0.35131 -0.16524,0.12498 -0.42213,0.12498 -0.32354,0 -0.51378,-0.19857 -0.18885,-0.19996 -0.18885,-0.5596 0,-0.37215 0.19163,-0.57766 0.19162,-0.20551 0.49711,-0.20551 0.29577,0 0.48323,0.20135 0.18746,0.20134 0.18746,0.56654 0,0.0222 -0.001,0.0666 h -1.09976 q 0.0139,0.24301 0.13747,0.37215 0.12359,0.12913 0.30827,0.12913 0.13747,0 0.23467,-0.0722 0.0972,-0.0722 0.15413,-0.23051 z m -0.82065,-0.40408 h 0.82343 q -0.0167,-0.18607 -0.0944,-0.2791 -0.11942,-0.14442 -0.30966,-0.14442 -0.17218,0 -0.29021,0.11526 -0.11665,0.11525 -0.12914,0.30826 z m 1.3872,0.87898 v -2.03567 h 0.24994 v 2.03567 z"
+				 id="text45-0"
+				 aria-label="Eye Level" /><path
+				 style="fill:none;fill-opacity:1;stroke:#909090;stroke-width:0.241838;stroke-linejoin:miter;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+				 d="m 126.55059,-121.60977 -14.44386,8.10111 -15.610445,-7.6955"
+				 id="path35-60" /><path
+				 style="font-size:3.06585px;font-family:Arial;-inkscape-font-specification:Arial;fill:#909090;stroke-width:0.200553;paint-order:fill markers stroke"
+				 d="m 117.19102,-111.85273 0.84879,-1.14371 -0.74849,-1.05089 h 0.3458 l 0.3982,0.56287 q 0.12425,0.17515 0.17665,0.26946 0.0734,-0.11976 0.17365,-0.25 l 0.44161,-0.58233 h 0.31587 l -0.77095,1.03443 0.83083,1.16017 h -0.35928 l -0.55239,-0.78293 q -0.0464,-0.0674 -0.0958,-0.1467 -0.0733,0.11975 -0.10479,0.16466 l -0.55089,0.76497 z m 2.0928,0 v -0.26946 l 1.12424,-1.40568 q 0.11976,-0.1497 0.22755,-0.26048 h -1.22455 v -0.25898 h 1.57185 v 0.25898 l -1.23203,1.52245 -0.13323,0.15419 h 1.40119 v 0.25898 z"
+				 id="text34-1-2"
+				 aria-label="XZ" /><path
+				 style="font-size:3.06585px;font-family:Arial;-inkscape-font-specification:Arial;fill:#909090;stroke-width:0.200553;paint-order:fill markers stroke"
+				 d="m 110.29878,-103.7119 0.8488,-1.1437 -0.7485,-1.0509 h 0.34581 l 0.3982,0.56287 q 0.12425,0.17515 0.17664,0.26946 0.0734,-0.11976 0.17366,-0.24999 l 0.44161,-0.58234 h 0.31587 l -0.77096,1.03443 0.83084,1.16017 h -0.35928 l -0.5524,-0.78293 q -0.0464,-0.0674 -0.0958,-0.1467 -0.0734,0.11976 -0.10479,0.16467 l -0.5509,0.76496 z m 2.88621,0 v -0.92963 l -0.8458,-1.26497 h 0.35329 l 0.43263,0.66168 q 0.11976,0.18562 0.22305,0.37125 0.0988,-0.17215 0.23952,-0.38772 l 0.42515,-0.64521 h 0.33832 l -0.87574,1.26497 v 0.92963 z"
+				 id="text34-86"
+				 aria-label="XY" /><path
+				 style="font-size:3.06585px;font-family:Arial;-inkscape-font-specification:Arial;fill:#909090;stroke-width:0.200553;paint-order:fill markers stroke"
+				 d="m 103.70507,-112.56037 v -0.92964 l -0.84581,-1.26496 h 0.35329 l 0.43264,0.66167 q 0.11976,0.18563 0.22305,0.37126 0.0988,-0.17216 0.23952,-0.38772 l 0.42515,-0.64521 h 0.33832 l -0.87575,1.26496 v 0.92964 z m 1.25149,0 v -0.26946 l 1.12424,-1.40568 q 0.11976,-0.1497 0.22754,-0.26048 h -1.22454 v -0.25898 h 1.57185 v 0.25898 l -1.23203,1.52245 -0.13323,0.15419 h 1.40119 v 0.25898 z"
+				 id="text34-8-0"
+				 aria-label="YZ" /><path
+				 id="path46-0"
+				 style="fill:#909090;stroke-width:0.241838;paint-order:fill markers stroke"
+				 d="m 97.460381,-121.20416 a 0.53025126,0.53025126 0 0 1 -0.530251,0.53025 0.53025126,0.53025126 0 0 1 -0.530251,-0.53025 0.53025126,0.53025126 0 0 1 0.530251,-0.53025 0.53025126,0.53025126 0 0 1 0.530251,0.53025 z" /><path
+				 id="path46-8-0"
+				 style="fill:#909090;stroke-width:0.241838;paint-order:fill markers stroke"
+				 d="m 126.22893,-121.09678 a 0.53025126,0.53025126 0 0 1 -0.53025,0.53025 0.53025126,0.53025126 0 0 1 -0.53025,-0.53025 0.53025126,0.53025126 0 0 1 0.53025,-0.53025 0.53025126,0.53025126 0 0 1 0.53025,0.53025 z" /></g></g></g></g>>
+	</symbol>
+	<symbol
+		viewBox="0 0 76.391161 46.916242"
+		version="1.1"
+		id="gatto"
+		xml:space="preserve"
+		xmlns="http://www.w3.org/2000/svg"
+		xmlns:svg="http://www.w3.org/2000/svg"><defs
+		 id="defs1" /><g
+		 id="layer2"
+		 transform="translate(27.40149,223.69987)"><g
+		   id="g62"
+		   transform="matrix(1.2028693,0,0,1.2028693,-34.792713,2.7278954)"
+		   style="stroke-width:0.332538;stroke-dasharray:none"><path
+			 id="path62-6"
+			 style="fill:none;stroke:#414141;stroke-width:2.07461;paint-order:fill markers stroke"
+			 d="m 68.614803,-165.60327 a 30.716419,15.329867 0 0 1 -30.716419,15.32987 30.716419,15.329867 0 0 1 -30.7164191,-15.32987 30.716419,15.329867 0 0 1 30.7164191,-15.32987 30.716419,15.329867 0 0 1 30.716419,15.32987 z" /><path
+			 style="fill:#464646;fill-opacity:1;stroke:#ffffff;stroke-width:0.332538;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+			 d="m 50.027751,-179.67835 c 0,-2.87031 3.46829,-9.44809 7.53456,-8.25214 4.06626,1.19597 1.43515,5.38183 0.59798,4.30547 -0.83718,-1.07637 -3.3487,-2.51152 -4.66425,-0.1196 -1.31556,2.39192 -2.15273,5.26222 -2.15273,5.26222 0,0 4.56858,3.5954 -0.71758,8.96971 -0.88514,0.8999 -4.0083,1.83307 -8.28734,2.84555 -6.4962,1.53708 -3.90096,4.12381 -6.36894,4.90235 -3.52862,1.11312 -0.35573,-2.85314 -3.47194,-3.05046 -1.84418,-0.11678 -2.55955,2.33395 -3.8387,1.53358 -2.16234,-1.35298 1.03587,-7.08962 -0.8238,-7.29169 -4.59208,-0.49897 -4.8468,-5.51742 -2.54893,-7.07187 2.03313,-1.37536 1.73415,-2.45171 4.12607,-5.26221 1.61454,1.67434 1.49495,2.57131 1.49495,2.57131 l 2.51152,0.47838 2.39192,-2.51152 2.03313,2.03314 c 0,0 1.15305,-1.63072 5.84549,-1.37536 4.88292,0.26572 6.33859,2.03314 6.33859,2.03314 z"
+			 id="path53-8" /><path
+			 id="path54-2-4"
+			 style="fill:#ffffff;stroke-width:0.332538;stroke-linejoin:round;paint-order:fill markers stroke"
+			 d="m 26.991346,-176.16052 a 0.84567189,0.84567189 0 0 1 -0.845672,0.84567 0.84567189,0.84567189 0 0 1 -0.845672,-0.84567 0.84567189,0.84567189 0 0 1 0.845672,-0.84567 0.84567189,0.84567189 0 0 1 0.845672,0.84567 z" /><path
+			 id="path54-2-1-9"
+			 style="fill:#ffffff;stroke-width:0.332538;stroke-linejoin:round;paint-order:fill markers stroke"
+			 d="m 34.227351,-175.54626 a 0.84567189,0.84567189 0 0 1 -0.845671,0.84567 0.84567189,0.84567189 0 0 1 -0.845672,-0.84567 0.84567189,0.84567189 0 0 1 0.845672,-0.84568 0.84567189,0.84567189 0 0 1 0.845671,0.84568 z" /><path
+			 style="fill:none;fill-opacity:1;stroke:#ffffff;stroke-width:0.332538;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+			 d="m 30.909701,-173.67012 c 0,0 -0.97927,1.53247 -1.65669,-0.0773 -1.10386,0.88685 -1.83181,0.6932 -1.75363,-0.60348"
+			 id="path54-6" /></g></g>>
+	</symbol>
+	<symbol 
+		viewBox="0 0 12.347017 12.242631"
+		version="1.1"
+		id="lightbulb"
+		xml:space="preserve"
+		xmlns="http://www.w3.org/2000/svg"
+		xmlns:svg="http://www.w3.org/2000/svg"><defs
+		 id="defs1" /><g
+		 id="layer2"
+		 transform="translate(-123.72315,149.94477)"><g
+		   id="g60"
+		   transform="translate(28.578059,1.2106746)"><g
+			 id="g58"
+			 transform="matrix(0.83154027,0,0,0.83154027,51.457231,-19.318451)"><path
+			   id="path55"
+			   style="fill:#ffffff;stroke:#ffffff;stroke-width:0.4;stroke-linejoin:round;paint-order:fill markers stroke"
+			   d="m 59.934371,-154.27176 c -1.901599,0 -3.442687,1.5416 -3.442684,3.4432 2e-6,1.33252 0.599073,2.33366 1.863969,3.54397 l 1.113627,-0.0103 -0.872298,-2.80862 2.63033,-0.008 -0.663009,2.80654 1.006145,-0.009 c 0.89071,-0.96365 1.80712,-2.20451 1.80712,-3.514 0,-1.9016 -1.54159,-3.4432 -3.4432,-3.4432 z" /><path
+			   style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.4;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+			   d="m 58.016321,-146.13936 c 3.76727,0 3.76727,0 3.76727,0"
+			   id="path56" /><path
+			   style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.4;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+			   d="m 58.016319,-145.08102 c 3.767272,0 3.767272,0 3.767272,0"
+			   id="path56-2" /><path
+			   style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:0.4;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
+			   d="m 58.54549,-144.02268 h 2.708934"
+			   id="path56-0" /></g>
+			   
+			   <g class="light-rays" style="opacity: var(--ray-opacity, 0);"><path
+			   style="fill:#ffffff;stroke:#ffffff;stroke-width:0.4;stroke-opacity:1;paint-order:fill markers stroke"
+			   d="m 101.40172,-149.20327 v -1.95216"
+			   id="path8" /><path
+			   style="fill:#ffffff;stroke:#ffffff;stroke-width:0.4;stroke-opacity:1;paint-order:fill markers stroke"
+			   d="m 104.4635,-147.55403 1.54166,-1.19758"
+			   id="path8-2" /><path
+			   style="fill:#ffffff;stroke:#ffffff;stroke-width:0.4;stroke-opacity:1;paint-order:fill markers stroke"
+			   d="m 105.53994,-144.881 h 1.95216"
+			   id="path8-6" /><path
+			   style="fill:#ffffff;stroke:#ffffff;stroke-width:0.4;stroke-opacity:1;paint-order:fill markers stroke"
+			   d="m 98.173688,-147.71725 -1.54166,-1.19758"
+			   id="path8-2-1" /><path
+			   style="fill:#ffffff;stroke:#ffffff;stroke-width:0.4;stroke-opacity:1;paint-order:fill markers stroke"
+			   d="m 97.097248,-145.04422 h -1.95216"
+			   id="path8-6-8" /></g></g></g>>
+	</symbol>
+</svg>
+
+</body>
+</html>

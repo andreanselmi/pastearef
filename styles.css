@@ -1,0 +1,737 @@
+/* --- Variables & Reset --- */
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&display=swap');
+
+:root {
+  --bg-main: #222222; /*sidebar background color*/
+  --bg-button: #333333;
+  --bg-secondary: #304a55;
+  --bg-button-hover: #444444;
+  --accent-blue: #3795d2;
+  --miniaccent-color: #706bff;
+  --text-main: #e3e3e3;
+  --text-muted: #a0a0a0;
+  --border-color: #c4c4c4;
+  --border-radius: 14px;
+  --grid-color: #444444;
+}
+
+/* New class for your JS toggle to target */
+body.light-grid {
+  --grid-color: #dadada; 
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #111; /* Just to show contrast */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--text-main);
+  font-size: 18px;
+}
+
+a {
+  color: var(--text-main);
+  text-decoration-color: var(--miniaccent-color);
+}
+
+/* --- Sidebar Container --- */
+.layout-wrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.sidebar {
+  flex: 0 0 400px;
+  height: 100vh;
+  background-color: var(--bg-main);
+  display: flex;
+  flex-direction: column; /* Stacks children vertically */
+  overflow-y: auto;
+}
+
+/* --- Header --- */
+.sidebar-header {
+  display: flex;
+  justify-content: space-between; /* Pushes title left, icon right */
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.sidebar-header h2 {
+  font-size: 24px;
+  font-weight: 500;
+  color: #ffffff;
+  font-family: 'ZCOOL KuaiLe', sans-serif;
+}
+
+/* WELCOME HELP PANEL DYNAMICS*/
+.help-panel {
+  max-height: 0; /* Start at zero height */
+  overflow: hidden; /* Hide the text inside */
+  transition: max-height 0.3s ease-out, padding 0.3s ease;
+
+  /* Syntax: linear-gradient(direction, color-start, color-end) */
+  background: linear-gradient(
+    to top,
+    var(--bg-secondary),
+    var(--bg-main)
+  );
+
+  padding: 0 15px; /* Horizontal padding only at start */
+}
+
+/* When the JS adds this class, it expands */
+.help-panel.show {
+  max-height: 200px; /* Set this to something larger than your text */
+  padding: 20px 15px; /* Bring back vertical padding */
+  margin-bottom: 15px;
+  border-bottom: 2px solid var(--accent-blue);
+  border-radius: 27px;
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+.load-form {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.input-row {
+  display: flex;
+  gap: 16px;
+}
+
+#model-id-input {
+  flex: 1;
+  border-radius: var(--border-radius);
+}
+
+#load-model {
+  flex: 0 0 20px;
+}
+
+/* --- Collapsible Sections --- */
+.dropdown {
+  border-bottom: 1px solid var(--border-color);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Uniform spacing between elements inside the section */
+}
+
+summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 24px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.subtitle {
+  color: var(--text-main);
+  font-size: 17px;
+  padding-bottom: 8px;
+}
+
+/* --- Buttons & Controls --- */
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+button {
+  flex: 1; /* Makes buttons grow equally to fill the row */
+  background-color: var(--bg-button);
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+  padding: 10px 12px;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  text-align: center;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: var(--bg-button-hover);
+}
+
+.grid-button {
+	width:10em;
+}
+/* The stepper number-of-grids choice */
+
+.stepper-control { /* the container*/
+	display:flex;
+	  border: 1px solid var(--border-color);
+	  border-radius: var(--border-radius);
+	}
+
+.stepper-input {
+  text-align: center;
+  border: 1px solid var(--bg-main);
+  background-color: transparent;
+  width: 2em;
+  color: white;
+  font-family: sans-serif;
+}
+
+.stepper-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 5px 12px;
+}
+
+/*The dropdown-choice select input*/
+
+select {
+  /* Reset default appearance */
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+
+  /* Layout & Pill Shape */
+  background: var(--bg-main) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 28' fill='none' stroke='%23c4c4c4' stroke-width='3'%3E%3Cpath d='m1 10 10 10 10-10'/%3E%3C/svg%3E") no-repeat right 12px center / 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  
+  /* Text & Spacing */
+  color: white;
+  padding: 8px 35px 8px 15px;
+  font-family: sans-serif;
+  cursor: pointer;
+  width:10em;
+  text-align:right;
+}
+
+/* Optional: Slight border highlight on hover */
+select:hover {
+  border-color: #888;
+}
+
+/* 1. The Container */
+.help-container {
+  position: relative; /* Acts as an anchor for the text */
+  display: inline-block;
+  color: var(--text-muted);
+  font-size:16px;
+}
+
+/* 2. The Info Box (Hidden by default) */
+.help-text {
+  visibility: hidden;
+  font-size: 16px;
+  opacity: 0;
+  width: 14em;
+  background-color: var(--bg-button);
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 100%; /* Places it above the button */
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 0.3s; /* Smooth fade-in */
+}
+
+/* 3. The Hover Logic (No JavaScript needed!) */
+.help-container:hover .help-text {
+  visibility: visible;
+  transition-delay: 0.5s;
+  opacity: 1;
+}
+
+.help-button {
+  flex: 0;
+  background: none;
+  border: 1px solid #666;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 14px;
+  border-radius: 80px;
+  padding: 0px 5px;
+  margin: 0px 10px;
+}
+
+/* --- Graphic Placeholder --- */
+.graphic-box {
+  width: 100%;
+  height: 120px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 12px;
+}
+
+#cube-drawing {
+  width: 100%;
+  height: 100%;
+}
+
+/* --- Toggle / Sliders / Data Rows --- */
+.flex-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 12px 0px;
+  list-style: none;
+}
+
+/* The container */
+.ios-switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 28px;
+}
+
+/* Hide the default checkbox */
+.ios-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The background track */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: transparent; /* iOS light gray off-state */
+  transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border-color);
+  border-radius: 34px;
+}
+
+/* The white circular knob of the checkbox*/
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 24px;
+  width: 24px;
+  left: 2px;
+  bottom: 1px;
+  background-color: white;
+  transition: .4s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15); /* Subtle Apple shadow */
+}
+
+/* ON State: Change background color */
+input:checked + .slider {
+  background-color: var(--accent-blue); /* iOS Green */
+}
+
+/* ON State: Slide the knob */
+input:checked + .slider:before {
+  transform: translateX(22px);
+}
+
+/* Tool Buttons Layout */
+.tools-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.tool {
+  flex: 1; /* Makes all 3 buttons equal width */
+  background: var(--bg-button);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 10px;
+  color: #fff;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.tool.active {
+  background: #444;
+  border-color: #666;
+}
+
+/* Colors Layout: 2 Rows x 6 Columns */
+.colors-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+  flex: 0 0 180px;
+}
+
+.color-swatch {
+  aspect-ratio: 1 / 1; /* Keeps them perfectly square */
+  border-radius: 6px;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.color-swatch.selected {
+  border-color: #fff;
+}
+
+.color-picker-wrapper.color-swatch {
+  top: 0px;
+  left: 0px;
+}
+
+#brush-color-picker {
+  opacity: 0;
+  width: 25px;
+}
+
+/* Clear Sketch Button */
+.btn-full-width {
+  width: 100%;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+
+.dot {
+  cursor: pointer;
+  background: #fff;
+  border-radius: 50%;
+  display: inline-block;
+  transition: transform 0.1s;
+}
+
+.dot:hover {
+  transform: scale(1.2); /* Slight zoom on hover to show they are interactive (∩｀-´)⊃━☆ﾟ.*･｡ﾟ  */
+}
+
+/* Base sizes for the dots */
+.dot-sm { width: 4px; height: 4px; }
+.dot-md { width: 8px; height: 8px; }
+.dot-lg { width: 14px; height: 14px; }
+.dot-xl { width: 20px; height: 20px; }
+
+.flex-row .dots {
+  display: flex;
+  flex-direction: row;
+  gap: 30px;
+  align-items: center;
+}
+
+.dot {
+  position: relative;
+}
+
+.dot::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* Set the hit area size here (standard is ~44px for touch/mouse) */
+  width: 25px;
+  height: 60px;
+}
+
+.dot-label {
+  position: absolute;
+  top: 28px;
+}
+
+#fov-slider {
+  width: 100%;
+  margin-top: 8px;
+}
+
+#apply-fov {
+  flex: 0 11em;
+}
+
+.slider-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  text-align: center;
+}
+
+.slider-labels span {
+  width: 25%;
+}
+
+/* --- Animation Data --- */
+.data-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.data-value {
+  font-family: 'Courier New', Courier, monospace;
+  color: var(--accent-blue);
+  font-size: 28px;
+}
+
+/*---Light UI ----*/
+.diagram-node {
+  position: relative;
+  margin-bottom: 54px;
+}
+
+.lighting-diagram {
+  display: flex;
+  justify-content: center;
+}
+
+.diagram-toggle-light {
+  /*the on/off buttons over the cat :)*/
+  cursor: pointer;
+  position: absolute;
+  padding: 10px 18px;
+  background: #444;
+  color: white;
+  border: 1px solid transparent;
+  border-radius: 19px;
+
+  /*controlling the ligh-bulb svg icon position with respect to the light-1,2,3 span text*/
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  --ray-opacity: 0;
+}
+
+.diagram-toggle-light.is-active {
+  border: 1px solid #ffffff;
+  --ray-opacity: 1;
+}
+
+.lightbulb-icon {
+  width: 35px;
+  height: 35px;
+  transform-origin: center;
+}
+
+#icon-light-1 { rotate: 45deg; }
+#icon-light-3 { rotate: -45deg; }
+
+.diagram-text {
+  font-size: 16px;
+}
+
+.toggle-light {
+  /*the on/off buttons on the sidebar*/
+  cursor: pointer;
+  padding: 8px 12px;
+  background: #444;
+  color: white;
+  border: 1px solid #666;
+  border-radius: 30px;
+  box-shadow: 3px 3px 2px rgba(0, 0, 0, 0.4);
+}
+
+.toggle-light:active {
+  transform: translateY(2px);
+}
+
+.ui-icon {
+  width: 24px;
+  height: 24px;
+  position: absolute;
+}
+
+.color-picker-wrapper {
+  width: 28px;
+  height: 28px;
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+  top: 5px;
+  left: 8px;
+}
+
+/* 2. The Hover State (ONLY what changes when the mouse is over it) */
+.color-picker-wrapper:hover {
+  background-color: #444;
+  border-radius: 10px;
+}
+
+/* 3. The Active State (ONLY what changes when clicking down) */
+.color-picker-wrapper:active {
+  top: 8px; /* Moves it down to look 'pressed' */
+}
+
+.color-picker {
+  /* Make the input invisible but cover the whole icon */
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+/*Right side of the page*/
+#viewer-container {
+  flex: 1; /* fill remaining horizontal space left by the sidebar*/
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+#api-frame {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+#horizon-line {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--grid-color);
+  z-index: 15;
+  pointer-events: none;
+  display: block;
+}
+
+#grid-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allows you to click "through" the grid */
+  z-index: 9999;
+  display: none; /* Hidden by default */
+}
+
+/* 1. Rectangular Grid using CSS Patterns */
+.border-bottom {border-bottom: 1px solid #575757; padding-bottom:9px;}
+
+.show-rect-grid {
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 2px, transparent 1px), /*Horizontal grid tile*/
+    linear-gradient(to bottom, var(--grid-color) 2px, transparent 1px); /*Vertical grid tile*/
+  /* The tile gets repeated following its size (we want a- always-square tile varying in size)*/
+  background-size: calc(100vw/var(--grid-cols)) calc(100vw/var(--grid-cols));
+}
+/* 3. Composition Guides (Rule of Thirds) */
+#composition-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none; /* Allows you to click "through" the grid */
+  z-index: 9999;
+}
+
+.off-active {
+  display: none;
+}
+
+.thirds-active {
+  background-image: 
+    linear-gradient(to right, var(--grid-color) 2px, transparent 1px), /*Horizontal grid tile*/
+    linear-gradient(to bottom, var(--grid-color) 2px, transparent 1px); /*Vertical grid tile*/
+  background-size: 33.33% 33.33%;
+  display: block;
+}
+
+.golden-ratio-active {
+  -webkit-mask-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3Csvg viewBox='0 0 379.55935 234.94945' version='1.1' id='svg1' xml:space='preserve' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cdefs id='defs1' /%3E%3Cg id='layer3' transform='translate(669.42066,-23.860018)'%3E%3Cpath id='path20-7' style='fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m -669.15606,258.54489 c 0,0 9.53327,-234.420291 234.5894,-234.420291 94.84901,0 144.73977,77.138851 144.41048,145.568691 -0.22034,45.79031 -31.24249,88.8516 -89.61094,88.8516 -36.12426,0 -53.37618,-27.82205 -54.44352,-54.63182 -0.35602,-8.94252 5.05628,-34.33289 35.04914,-34.4946 20.07685,-0.10825 28.48214,34.73716 6.24419,34.15772 m 0,-6.76537 h -7.31507 m 7.31507,-6.76538 v 13.53075 m -7.31507,-13.53075 h 20.46526 m -20.46526,-20.46526 v 33.99601 m 20.46526,0 h -54.79954 m 54.79954,-33.99601 v 88.96471 m -54.79954,-88.96471 h 144.44078 M -434.56666,24.124599 V 258.54489 M -669.15604,24.124599 h 379.03018 V 258.54489 h -379.03018 z' /%3E%3C/g%3E%3C/svg%3E%0A");
+  mask-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3Csvg viewBox='0 0 379.55935 234.94945' version='1.1' id='svg1' xml:space='preserve' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cdefs id='defs1' /%3E%3Cg id='layer3' transform='translate(669.42066,-23.860018)'%3E%3Cpath id='path20-7' style='fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m -669.15606,258.54489 c 0,0 9.53327,-234.420291 234.5894,-234.420291 94.84901,0 144.73977,77.138851 144.41048,145.568691 -0.22034,45.79031 -31.24249,88.8516 -89.61094,88.8516 -36.12426,0 -53.37618,-27.82205 -54.44352,-54.63182 -0.35602,-8.94252 5.05628,-34.33289 35.04914,-34.4946 20.07685,-0.10825 28.48214,34.73716 6.24419,34.15772 m 0,-6.76537 h -7.31507 m 7.31507,-6.76538 v 13.53075 m -7.31507,-13.53075 h 20.46526 m -20.46526,-20.46526 v 33.99601 m 20.46526,0 h -54.79954 m 54.79954,-33.99601 v 88.96471 m -54.79954,-88.96471 h 144.44078 M -434.56666,24.124599 V 258.54489 M -669.15604,24.124599 h 379.03018 V 258.54489 h -379.03018 z' /%3E%3C/g%3E%3C/svg%3E%0A");
+  mask-size: 100% 100%;
+  /* You control the color here! */
+  background-color: var(--grid-color);
+  display: block;
+}
+
+.animation-layout-active {
+  -webkit-mask-image:url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3C!-- Created with Inkscape (http://www.inkscape.org/) --%3E%3Csvg viewBox='0 0 477.71754 311.19018' version='1.1' id='svg1' xml:space='preserve' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cdefs id='defs1' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect20' width='477.18835' height='267.41684' x='0.26459518' y='43.508793' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect21' width='432.98407' height='243.8918' x='22.474617' y='55.001286' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect22' width='386.64124' height='221.22778' x='45.476875' y='66.502441' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 239.03814,172.91171 v 8.25212' id='path22' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 234.93193,177.04275 h 8.25212' id='path22-2' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 450.16657,177.18728 h 5.29212' id='path22-2-2' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 22.474621,176.94718 h 5.29212' id='path22-2-2-9' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 238.96665,298.89307 v -5.29212' id='path22-2-2-1' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 239.0767,48.800912 v -5.29212' id='path22-2-2-19' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect23' width='27.507097' height='5.979804' x='51.212471' y='2.4873078' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect23-9' width='27.507097' height='5.979804' x='398.75906' y='2.7224762' /%3E%3Ccircle style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='path24' cx='238.81798' cy='6.0574369' r='5.7928529' /%3E%3C/svg%3E%0A");
+  mask-image: url("data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3C!-- Created with Inkscape (http://www.inkscape.org/) --%3E%3Csvg viewBox='0 0 477.71754 311.19018' version='1.1' id='svg1' xml:space='preserve' xmlns='http://www.w3.org/2000/svg' xmlns:svg='http://www.w3.org/2000/svg'%3E%3Cdefs id='defs1' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect20' width='477.18835' height='267.41684' x='0.26459518' y='43.508793' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect21' width='432.98407' height='243.8918' x='22.474617' y='55.001286' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect22' width='386.64124' height='221.22778' x='45.476875' y='66.502441' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 239.03814,172.91171 v 8.25212' id='path22' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 234.93193,177.04275 h 8.25212' id='path22-2' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 450.16657,177.18728 h 5.29212' id='path22-2-2' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 22.474621,176.94718 h 5.29212' id='path22-2-2-9' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 238.96665,298.89307 v -5.29212' id='path22-2-2-1' /%3E%3Cpath style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' d='m 239.0767,48.800912 v -5.29212' id='path22-2-2-19' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect23' width='27.507097' height='5.979804' x='51.212471' y='2.4873078' /%3E%3Crect style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='rect23-9' width='27.507097' height='5.979804' x='398.75906' y='2.7224762' /%3E%3Ccircle style='opacity:1;fill:none;stroke:%23000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke' id='path24' cx='238.81798' cy='6.0574369' r='5.7928529' /%3E%3C/svg%3E%0A");
+  mask-size: 95% 95%;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  /* You control the color here! */
+  background-color: var(--grid-color);
+  display: block;
+}
+
+/*LETTERBOXES*/
+#letterbox-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  margin: auto;
+  width: auto;
+  height: auto;
+  max-width: 95%;
+  max-height: 95%;
+  display: none;
+  pointer-events: none;
+  z-index: 9999;
+  /* Standard Shadow */
+  box-shadow: 0 0 0 5000px rgba(0, 0, 0, 0.8);
+}
+
+#letterbox-overlay.is-active {
+  display: block;
+}
+
+/* --- THE GRID SYNC TRICK --- */
+#letterbox-overlay.is-animation-grid {
+  /* 1. Make the wrapper EXACTLY match the SVG viewBox ratio */
+  aspect-ratio: 477.71754 / 311.19018 !important;
+  /* Remove the shadow from the parent so it doesn't add to the clone */
+  box-shadow: none;
+}
+
+#letterbox-overlay.is-animation-grid::before {
+  content: "";
+  position: absolute;
+  /* 2. Map directly to your SVG rect22 coordinates! */
+  top: 17.78%;
+  bottom: 3.829%;
+  left: 4.602%;
+  right: 4.602%;
+  /* Apply the shadow to this perfectly aligned inner box */
+  box-shadow: 0 0 0 5000px rgba(0, 0, 0, 0.8);
+}
+
+/* IMPORTANT: the following setting allows the render "this.renderer.domElement" (which is a special instance of 
+an HTML canvas element) created in gridManager() to show on top of the iframe and with the right dimentions
+after beeing created and appended as a child to viewer-container
+*/
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#drawing-canvas {
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  z-index: 11;
+  pointer-events: auto; /*pointers-events: auto is critical so that the user can draw on the canvas*/
+  display: none;
+}
