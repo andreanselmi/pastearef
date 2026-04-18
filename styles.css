@@ -110,7 +110,7 @@ a {
 
 #model-id-input {
   flex: 1;
-  border-radius: var(--border-radius);
+  border-radius: 14px;
 }
 
 #load-model {
@@ -225,6 +225,7 @@ select:hover {
   display: inline-block;
   color: var(--text-muted);
   font-size:16px;
+  text-align:right;
 }
 
 /* 2. The Info Box (Hidden by default) */
@@ -734,4 +735,103 @@ canvas {
   z-index: 11;
   pointer-events: auto; /*pointers-events: auto is critical so that the user can draw on the canvas*/
   display: none;
+}
+
+/* ============================================================================================================================= */
+
+/* --- Mobile Responsiveness (Media Queries) --- */
+@media screen and (max-width: 1350px) {
+	.sidebar {flex: 0 0 340px;}
+
+.flex-row.dots{
+	font-size: 15px;
+	gap:20px;
+}
+}
+@media screen and (max-width: 768px) {
+  
+  :root {--border-radius: 90px;}
+  
+  /* 1. Stack the layout vertically */
+  .layout-wrapper {flex-direction: column;}
+
+  /* 2. Move Viewer to the TOP and adjust size */
+  #viewer-container {
+    flex: 1 1 60vh; /* Takes up 60% of the viewport height; 1 1 means the container is allowed toboth grow and shrink if there is enough space*/
+    width: 100vw;
+    order: 1; /* Forces viewer to render first visually */
+  }
+
+  /* 3. Move Sidebar to the BOTTOM and make it scrollable */
+  .sidebar {
+    flex: 1 1 44vh; /* Takes up the remaining 44% */
+    order: 2; /* Forces controls to render below the viewer */
+  }
+  summary {
+  font-size:21px;
+  margin: -5px 0px;
+  }
+  .graphic-box {display:none;}
+
+  /* 4. Touch Target Optimization (Standard 44px min-height for touch) */
+  button, 
+  select, 
+  .stepper-btn, 
+  .toggle-light {
+    min-height: 44px;
+  }
+  
+  .ios-switch {
+	  width: 65px;
+	  height: 35px;
+  }
+  
+  .slider::before {
+    height:29px;
+    width:29px;
+    bottom: 2px;	
+  }
+  
+  input:checked + .slider:before {transform: translateX(28px);}
+  
+.flex-row.dots{
+	font-size: 18px;
+	gap:25px;
+}
+.colors-grid {gap: 8px; /* Slightly larger gap to prevent accidental fat-finger taps */}
+
+.help-button {
+	padding: 0 10px;
+	font-size:16px;
+	min-height: 30px;
+}
+  /* 5. Responsive Form Elements & Buttons */ 
+  .grid-button,#apply-fov {
+    width: 100%; /* Let these span the full width of the container on mobile */
+    text-align: center;
+  }
+
+  select {
+    background-position: right 15px center; /* Adjust dropdown arrow placement */
+	text-align: center;
+	width:14em;
+  }
+
+  /* 6. Allow flexible wrapping for cramped rows */
+  .input-row, 
+  .btn-row, 
+  .tools-container {
+    flex-wrap: wrap;
+  }
+
+  .help-panel.show {
+    max-height: 300px; /* Allow more vertical room for wrapped text */
+    font-size: 16px;
+  }
+
+/* Extra breakpoint for very small phones (e.g., older iPhones) */
+@media screen and (max-width: 400px) {
+  .colors-grid {
+    grid-template-columns: repeat(4, 1fr); /* Drop to 4 columns if it gets too narrow */
+  }
 }
