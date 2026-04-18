@@ -1,4 +1,6 @@
 # PasteARef
+### DISCLAIMER:
+This project is a personal, independent and educational tool built using the [Sketchfab Viewer API](https://sketchfab.com/developers/viewer) and is not officially affiliated with or endorsed by Sketchfab by any means. You can see extensive documentation of the API use [here](https://sketchfab.com/developers/viewer/functions) and [here](https://www.devfab.io/).
 
 ### What is it in brief? 
 A website hosting an enhanced Sketchfab 3D model viewer based on the Sketchfab Viewer API. It features customized controls and tools dedicated to visual artists using the site for reference or artistic studies—like perspective grids, FOV control, frame-by-frame animation control, and lighting customization.
