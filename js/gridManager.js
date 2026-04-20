@@ -23,7 +23,7 @@ class GridManager {
             side: THREE.DoubleSide,
             depthWrite: false,
             uniforms: {
-                uSize: { value: 1.0 *dist *0.05},
+                uSize: { value: 1.0 *dist *0.02},
                 uColor: { value: new THREE.Color(color) }
             },
 			extensions:{
