@@ -35,7 +35,7 @@ class GridManager {
     }
 
     initGrids(dist) {
-        const geo = new THREE.PlaneGeometry(200, 200);
+        const geo = new THREE.PlaneGeometry(100*dist, 100*dist);
 
         // Define our grid configurations
         const configs = [
