@@ -15,11 +15,11 @@ let isDrawing = false;
 let hasDrawn = false;
 let prevMouseX, prevMouseY, snapshot;
 let selectedTool = "brush";
-let brushWidth = parseInt(sizeSlider.value, 10);
+let brushWidth = parseInt(sizeSlider.value, 2);
 let selectedColor = "#000000";
 
 let undoStack = [];
-const UNDOLIMIT = 5;
+const UNDOLIMIT = 10;
 
 // -----------------------------------------
 // UI CONTROLS LOGIC
@@ -27,12 +27,10 @@ const UNDOLIMIT = 5;
 
 // Helper function to manage the undo cntrl+zIndex
 const saveState = () => {
-	if (undoStack.lenght < UNDOLIMIT) {
-		undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-	} else { // if we reached the undo limit we trash the first state saved
-		undoStack.shift;
-		undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
-	};
+	if (undoStack.length >= UNDOLIMIT) { //if we reach the limit we trash the first screenshot in the memory stack
+		undoStack.shift();
+		}
+	undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
 };
 
 
@@ -91,13 +89,7 @@ sizeSlider.addEventListener("input", (e) => {
 });
 
 // Clickable Dots (Syncs with slider)
-const dotSizes = {
-    "dot-sm": 2,
-    "dot-md": 5,
-    "dot-lg": 12,
-    "dot-xl": 20
-};
-
+const dotSizes = {"dot-sm": 2,"dot-md": 5,"dot-lg": 12,"dot-xl": 20};
 sizeDots.forEach(dot => {
     dot.addEventListener("click", (e) => {
         // Check which class the clicked dot has and set size accordingly
@@ -119,78 +111,88 @@ clearCanvasBtn.addEventListener("click", () => {
 });
 
 // -----------------------------------------
-// CANVAS DRAWING LOGIC
+// CANVAS DRAWING LOGIC (Mouse + Touch input)
 // -----------------------------------------
+
+// Helper to get correct coordinates for both Mouse and Touch
+const getPos = (e) => {
+    if (e.touches && e.touches.length > 0) {
+        const rect = canvas.getBoundingClientRect();
+        return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    }
+    return { x: e.offsetX, y: e.offsetY };
+};
 
 const startDraw = (e) => {
     if (!canvasToggle.checked) return;
     
     isDrawing = true;
-    hasDrawn = true;
-    prevMouseX = e.offsetX;
-    prevMouseY = e.offsetY;
+	hasDrawn = true;
+    const pos = getPos(e);
     
     ctx.beginPath();
     ctx.lineWidth = brushWidth;
     ctx.strokeStyle = selectedColor;
     ctx.fillStyle = selectedColor;
-    
     snapshot = ctx.getImageData(0, 0, canvas.width, canvas.height);
     
-    // Logic for Text Tool
     if (selectedTool === "text-tool") {
         const text = prompt("Enter text to place on canvas:");
         if (text) {
             ctx.globalCompositeOperation = "source-over";
-            // Scale font size based on brush width (multiplier can be adjusted)
             ctx.font = `${brushWidth * 3}px sans-serif`; 
-            ctx.fillText(text, e.offsetX, e.offsetY);
-			saveState();
+            ctx.fillText(text, pos.x, pos.y);
+            saveState();
         }
-        isDrawing = false; // Prevent drawing a line after placing text
+        isDrawing = false; 
     }
 };
 
 const drawing = (e) => {
-    if (!isDrawing || selectedTool === "text-tool") return; // Text tool doesn't drag
+    if (!isDrawing || selectedTool === "text-tool") return;
+    e.preventDefault(); // Prevents scrolling on touch devices while drawing
     
+    const pos = getPos(e);
     ctx.putImageData(snapshot, 0, 0);
 
-    if (selectedTool === "eraser") {
-        ctx.globalCompositeOperation = "destination-out";
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();        
-    } else if (selectedTool === "brush") {
-        ctx.globalCompositeOperation = "source-over";
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
+    ctx.globalCompositeOperation = selectedTool === "eraser" ? "destination-out" : "source-over";
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+};
+
+const stopDraw = () => {
+    if (isDrawing) {
+        isDrawing = false;
+        if (selectedTool !== "text-tool") saveState();
     }
 };
 
-// Event Listeners for mouse actions
+
+//==========================================================================
+// Mouse Events
 canvas.addEventListener("mousedown", startDraw);
 canvas.addEventListener("mousemove", drawing);
-canvas.addEventListener("mouseup", () => {
-	if (isDrawing) {
-		isDrawing = false;
-		if (selectedTool!=="text-tool") {
-			saveState();
-		}
-	}
-});
+canvas.addEventListener("mouseup", stopDraw);
+canvas.addEventListener("mouseout", stopDraw); // Stops drawing if cursor leaves canvas
 
-//Event listner for the undo cntrl-z LOGIC
+// Touch Events
+canvas.addEventListener("touchstart", (e) => { e.preventDefault(); startDraw(e); }, { passive: false });
+canvas.addEventListener("touchmove", drawing, { passive: false });
+canvas.addEventListener("touchend", stopDraw);
+
+// -----------------------------------------
+// UNDO LOGIC (Ctrl+Z)
+// -----------------------------------------
 const undoLastAction = () => {
-	if (undoStack.length > 1) {
-		undoStack.pop();
-		ctx.putImageData(undoStack[undoStack.length -1],0,0);
-	}
+    if (undoStack.length > 1) {
+        undoStack.pop();
+        ctx.putImageData(undoStack[undoStack.length - 1], 0, 0);
+    }
 };
 
 document.addEventListener("keydown", (e) => {
-	if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
-		e.preventDefault();
-		undoLastAction();
-		console.log('gna');
-	}
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "z") {
+        e.preventDefault();
+        undoLastAction();
+    }
 });
