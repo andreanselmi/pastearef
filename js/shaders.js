@@ -10,17 +10,15 @@ const VERTEX_SHADER = `
 
 
 const FRAGMENT_SHADER = `
-	uniform float uSize; // This is a user provided input that defines the grid spacing in the gridManager._createMaterial
-	uniform vec3 uColor; // This instead provide the required color
+	uniform vec3 uColor; // This user defined property provide the required color
+	uniform float nGridSteps;
     float uFadeDist = 0.5;
     varying vec2 vUv; // Three.js provides this automatically if you ask
 	
 	void main() {
-		// We use vUv (0.0 to 1.0) multiplied by a scale factor
-
-		float scaleFact = 200.0 / uSize; // this sets the size of the grid spacing scaled between the relative plane uv coordinates from 0 to 1 and the world coordinates
+		// We use vUv (0.0 to 1.0) multiplied by a the number of grids elements
 			
-		vec2 mainFrac = abs(fract(vUv * scaleFact - 0.5) - 0.5) / fwidth(vUv * scaleFact); //always >=0 sawtooth along the x or y grid
+		vec2 mainFrac = abs(fract(vUv * nGridSteps - 0.5) - 0.5) / fwidth(vUv * nGridSteps); //always >=0 sawtooth along the x or y grid
 		float line = min(mainFrac.x,mainFrac.y);		
 		float mainColor = 1.0 - min(line, 1.0); // when assigned to the alpha color channel makes the plane transparent except when we are along a grid line either in X or Y
 
@@ -28,10 +26,15 @@ const FRAGMENT_SHADER = `
         float dist = length((vUv-0.5).xy);
 		float alphaFade = 1.0 - smoothstep(0.0, uFadeDist, dist); // fading-out everything more than uFadeDist away from the center of the plane
 
-		gl_FragColor = vec4(uColor, mainColor*alphaFade); //let's convolute the grid-intrinsic transparent-except-when-on-a-grid with the fading
+		gl_FragColor = vec4(uColor, mainColor*alphaFade); //let's convolute the grid-intrinsic transparent-except-when-on-a-grid with the fading *alphaFade
 	}
 `;
 
+
+
+
+//=========================================================================================
+// Below is an unused fragment shader with embedded shadow for testing light grids without button toggle: works but suffers from aliasing
 
 const FRAGMENT_SHADER_with_encoded_shadow = `
 	uniform float uSize; // This is a user provided input that defines the grid spacing in the gridManager._createMaterial

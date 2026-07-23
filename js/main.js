@@ -178,9 +178,10 @@ async function loadModel(modelId) {
     const iframe = document.getElementById('api-frame');
     const client = new Sketchfab(iframe);
 
-    console.log("🚀 Initializing model:", modelId);
+    console.log("Initializing model:", modelId);
 
     client.init(modelId, {
+		//camera:0, //Disable initial sketchfab zoom animation
         success: async function(api) {
             apiInstance = api;
 
@@ -199,9 +200,16 @@ async function loadModel(modelId) {
                             cam.target[2] - cam.position[2]
                         );
 
-                        // Now it's safe to initialize grids. 
-                        // The 'undefined' error disappears because this happens FIRST.
-                        gridManager.initGrids(dist);
+						// If some grids are already there we delete them and reset the scene and grid buttons UI
+						if (Object.keys(gridManager.grids).length > 0) {
+							if (['xy', 'yz', 'xz'].some(p => gridManager.isVisible(p))){
+								gridManager.destroy();
+							}
+						}
+						
+						// Now it's safe to initialize grids
+						
+                        gridManager.initGrids(dist/2); //dist
 
                         // --- STEP 2: INITIALIZE SUBSYSTEMS ---
                         // We move these to helper functions to keep loadModel readable
@@ -212,6 +220,7 @@ async function loadModel(modelId) {
                         // Only now do we allow the camera to trigger 'sync'
                         setupCameraListeners(api);
                         
+						console.log("Initial camera sync is lauched");
                         sync(); // Final initial render
                         playBtn.innerText = "\u23F8";
 
@@ -225,7 +234,7 @@ async function loadModel(modelId) {
     });
 }
 
-// --- HELPER FUNCTIONS (Maintenance-friendly) ---
+// --- HELPER FUNCTIONS ---
 
 function setupCameraListeners(api) {
     api.addEventListener('camerastop', () => {
@@ -233,6 +242,7 @@ function setupCameraListeners(api) {
         const horizonActive = document.getElementById('horizon-toggle').checked;
 
         if (anyGridActive || horizonActive) {
+			//console.log("grids are active launching a sync() each time the api says camera stop");
             sync();
         }
     }, { pick: 'fast' });
@@ -243,7 +253,7 @@ async function initializeLights(api) {
     const lightPromises = [0, 1, 2].map(i => promisify(api.getLight, i));
     statesLight = await Promise.all(lightPromises);
     
-    console.log("💡 Lights loaded:", statesLight);
+    //console.log("Lights loaded:", statesLight);
     setupLightingUI();
 }
 
@@ -251,13 +261,13 @@ async function initializeAnimations(api) {
     const animations = await promisify(api.getAnimations);
     
     if (!animations || animations.length === 0) {
-        console.log("📦 Static model loaded.");
+        //console.log("Static model loaded.");
         isPlaying = false;
         // ... (update UI for static model)
         return;
     }
 
-    console.log("🎬 Animated model detected.");
+    //console.log("Animated model detected.");
     isPlaying = true;
 
     if (updateTimer) clearInterval(updateTimer);
@@ -288,7 +298,8 @@ function sync() {
 				Math.pow((cam.target[1] - cam.position[1]), 2) +
 				Math.pow((cam.target[2] - cam.position[2]), 2)
 			);
-
+			//console.log(dist, cam);
+			
 			const h = document.getElementById('viewer-container').offsetHeight;
 			const pitch = Math.asin((cam.target[2] - cam.position[2]) / dist);
 			const yOffset = (Math.tan(pitch) / Math.tan((fov * Math.PI/180) / 2)) * (h/2);

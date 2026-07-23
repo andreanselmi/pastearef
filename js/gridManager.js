@@ -5,7 +5,7 @@ class GridManager {
     constructor(containerId) {
         this.container = document.getElementById(containerId);
         this.scene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera(45, this.container.offsetWidth / this.container.offsetHeight, 0.1, 10000);
+        this.camera = new THREE.PerspectiveCamera(45, this.container.offsetWidth / this.container.offsetHeight, 0.1, 100000);
         this.camera.up.set(0, 0, 1);
 
         this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
@@ -17,13 +17,14 @@ class GridManager {
     }
 
     // A helper to create shader materials concisely
-    _createMaterial(color, dist) {
+	// TO DO: 1)include the number of grid spacing in the fragment shater as a uniform passed from here 2) remove uniform uSize and dist which serves no purpose
+    _createMaterial(color) {
         return new THREE.ShaderMaterial({
             transparent: true,
             side: THREE.DoubleSide,
             depthWrite: false,
             uniforms: {
-                uSize: { value: 1.0 *dist *0.02},
+				nGridSteps: { value: 100.0}, // this is basically the number of grids spacing which is then multiplied to relative plane uv coordinates from 0 to 1 in the FRAGMENT SHADER
                 uColor: { value: new THREE.Color(color) }
             },
 			extensions:{
@@ -35,7 +36,8 @@ class GridManager {
     }
 
     initGrids(dist) {
-        const geo = new THREE.PlaneGeometry(200, 200);
+        const geo = new THREE.PlaneGeometry(4*dist, 4*dist);
+		console.log("plane size is ", 4*dist);
 
         // Define our grid configurations
         const configs = [
@@ -45,14 +47,32 @@ class GridManager {
         ];
 
         configs.forEach(cfg => {
-            const mesh = new THREE.Mesh(geo, this._createMaterial(cfg.color, dist));
+            const mesh = new THREE.Mesh(geo, this._createMaterial(cfg.color));
             mesh.position.set(...cfg.pos);
             mesh.rotation.set(...cfg.rot);
             mesh.visible = false;
             this.scene.add(mesh);
-            this.grids[cfg.id] = mesh;
+            this.grids[cfg.id] = mesh; //storing the 3 meshes in the grids Object (NOT an array)
         });
     }
+	
+	destroy() {
+		// Dispose of all the meshes, their geometries and materials
+		Object.values(this.grids).forEach(mesh => {
+			this.scene.remove(mesh);
+			mesh.geometry.dispose();
+			mesh.material.dispose();
+		});
+		
+		this.grids={}; //cleaning the grids Object
+		
+		this.renderer.renderLists.dispose();
+		
+		// Cleaning the buttons UI
+		document.querySelectorAll('.grid-button').forEach(button => {
+			button.style.backgroundColor = "var(--bg-button)";
+		});
+	}
 
     toggle(id) {
         if (this.grids[id]) {
